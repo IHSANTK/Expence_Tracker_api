@@ -271,7 +271,7 @@
  * @swagger
  * /deleteincome/{userId}/{expenseId}:
  *   delete:
- *     summary: Delete expense
+ *     summary: Delete income
  *     tags: [Users]
  *     parameters:
  *       - in: path
@@ -310,7 +310,7 @@
  * @swagger
  * /allsummery/{userId}:
  *   get:
- *     summary: get user
+ *     summary: get all summery
  *     tags: [Users]
  *     parameters:
  *       - in: path
