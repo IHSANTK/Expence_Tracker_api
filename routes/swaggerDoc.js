@@ -306,6 +306,25 @@
  */
 
 
+/**
+ * @swagger
+ * /allsummery/{userId}:
+ *   get:
+ *     summary: get user
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *       
+ *     responses:
+ *       200:
+ *         description: Get user
+ *       500:
+ *         description: Server error
+ */
+
+
 
 /**
  * @swagger

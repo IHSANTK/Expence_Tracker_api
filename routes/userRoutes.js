@@ -20,8 +20,9 @@ router.post('/addincome/:id',authenticate,UserController.addIncome);
 router.put('/updateincome/:id/:incomeId',authenticate,UserController.updateIncome);
 router.delete('/deleteincome/:id/:incomeId',authenticate,UserController.deleteIncome); 
 
-router.get('/expensesum/:id',authenticate,UserController.getExpensesSum);
-router.get('/:id/income/sum',authenticate,UserController.getIncomeSum);
+router.get('/allsummery/:id',authenticate,UserController.getallsummery) 
+
+
 
 
 

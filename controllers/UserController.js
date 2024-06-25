@@ -107,8 +107,12 @@ exports.logout = async (req,res)=>{
 exports.getUserById = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
+  
     if (!user) return res.status(404).send();
-    res.send(user);
+    const name = user.name
+    const email = user.email
+
+    res.json({name,email}); 
   } catch (error) {
     res.status(500).send(error);
   }
@@ -129,6 +133,10 @@ exports.addExpense = async (req, res) => {
     try {
       const { id } = req.params;
       const expense = req.body;
+   
+      if (!req.user) {
+        return res.status(401).send("Unauthorized");
+      }
   
       const user = await User.findOneAndUpdate(
         { _id: id },
@@ -140,7 +148,10 @@ exports.addExpense = async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
   
-      res.redirect(`/expensesum/${user._id}`);
+      const expensesSum = user.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+      const allexpenses = user.expenses
+      res.json({ expensesSum,allexpenses});
+
     } catch (error) {
       res.status(400).send(error);
     }
@@ -200,15 +211,30 @@ exports.deleteExpense = async (req, res) => {
 
 
 exports.addIncome = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send();
-    user.income.push(req.body);
-    await user.save();
-    res.send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
+    try {
+        const { id } = req.params;
+        const income = req.body;
+     
+        if (!req.user) {
+          return res.status(401).send("Unauthorized");
+        }
+    
+        const user = await User.findOneAndUpdate(
+          { _id: id },
+          { $push: { income: income} },
+          { new: true, runValidators: true }
+        );
+    
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
+    
+        const incomeSum = user.income.reduce((sum, income) => sum + income.amount, 0);
+        const allincome = user.income
+        res.json({ incomeSum,allincome });
+      } catch (error) {
+        res.status(400).send(error);
+      }
 };
 
 exports.updateIncome = async (req, res) => {
@@ -263,33 +289,45 @@ exports.deleteIncome = async (req, res) => {
       }
 };
 
-
-
-exports.getExpensesSum = async (req, res) => {
+exports.getallsummery = async (req, res) => {
     try {
-        console.log("oook");
-      const user = await User.findById(req.params.id);
-      if (!user) return res.status(404).send();
+      console.log(req.params.id);
   
-      const expensesSum = user.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+      if (!req.user) {
+        return res.status(401).send("Unauthorized");
+      }
+  
+      const user = await User.findById(req.params.id);
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+  
+      const totalExpenses = user.expenses.reduce((total, expense) => total + expense.amount, 0);
+  
+     
+      const totalIncomes = user.income.reduce((total, income) => total + income.amount, 0);
+  
+      const balance = totalIncomes - totalExpenses;
       const allexpenses = user.expenses
-      res.json({ expensesSum,allexpenses});
-    } catch (error) {
-      res.json(500).send(error);
-    }
-  };
+      const allincome = user.income
   
-  exports.getIncomeSum = async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id);
-      if (!user) return res.status(404).send();
-  
-      const incomeSum = user.income.reduce((sum, income) => sum + income.amount, 0);
-      res.send({ incomeSum });
+      res.json({
+        totalExpenses,
+        totalIncomes,
+        balance,
+        allexpenses,
+        allincome
+
+        
+      });
     } catch (error) {
       res.status(500).send(error);
     }
   };
+
+
+
+
 
 
 
