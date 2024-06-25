@@ -1,24 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const UserController = require('../controllers/UserController');
+const {authenticate} = require('../middlewear/jwt')
 
 router.post('/signin', UserController.createUser);
 router.post('/login',UserController.loginuser)
-router.get('/:id', UserController.getUserById);
-router.put('/:id', UserController.updateUser);
-router.delete('/:id', UserController.deleteUser);
+router.get('/getuser/:id', UserController.getUserById);
+router.put('/updateuser/:id', UserController.updateUser);
+
+router.post('/logout',authenticate,UserController.logout)
 
 
-router.post('/:id/expenses', UserController.addExpense);
-router.put('/:id/expenses/:expenseId', UserController.updateExpense);
-router.delete('/:id/expenses/:expenseId', UserController.deleteExpense);
+router.post('/addexpenses/:id',authenticate,UserController.addExpense);
+router.put('/updateexpense/:id/:expenseId',authenticate,UserController.updateExpense);
+router.delete('/deleteexpense/:id/:expenseId',authenticate, UserController.deleteExpense);
 
 
-router.post('/:id/income', UserController.addIncome);
-router.put('/:id/income/:incomeId', UserController.updateIncome);
-router.delete('/:id/income/:incomeId', UserController.deleteIncome); 
+router.post('/addincome/:id',authenticate,UserController.addIncome);
+router.put('/updateincome/:id/:incomeId',authenticate,UserController.updateIncome);
+router.delete('/deleteincome/:id/:incomeId',authenticate,UserController.deleteIncome); 
 
-router.get('/expensesum/:id', UserController.getExpensesSum);
-router.get('/:id/income/sum', UserController.getIncomeSum);
+router.get('/expensesum/:id',authenticate,UserController.getExpensesSum);
+router.get('/:id/income/sum',authenticate,UserController.getIncomeSum);
 
 module.exports = router;

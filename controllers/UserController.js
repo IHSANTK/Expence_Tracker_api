@@ -5,9 +5,7 @@ require('dotenv').config();
 const jwtSecret = process.env.JWT_SECRET;
 
 // Generate JWT tokens
-const generateAccessToken = (user) => {
-  
-   
+const generateAccessToken = (user) => { 
  return  jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '15m' });
 
 };
@@ -20,6 +18,7 @@ const generateRefreshToken = (user) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    console.log("oook");
 
     const existingUser = await User.findOne({ email });
 
@@ -86,6 +85,23 @@ exports.loginuser = async (req, res) => {
   }
 };
 
+exports.logout = async (req,res)=>{
+
+    const user = req.user;
+
+    console.log(user);
+    if (!user) {
+      return res.status(401).send("Unauthorized");
+    }
+    res
+      .clearCookie("refreshToken")
+      .clearCookie("accessToken")
+      .status(200)
+      .send("Logged out successfully");
+
+}
+
+
 
 
 exports.getUserById = async (req, res) => {
@@ -108,56 +124,80 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-exports.deleteUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).send();
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
 
 exports.addExpense = async (req, res) => {
-  try {
-    console.log("dfdafdf");
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send();
-    user.expenses.push(req.body);
-    await user.save();
-    res.redirect(`/expensesum/${user._id}`);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
+    try {
+      const { id } = req.params;
+      const expense = req.body;
+  
+      const user = await User.findOneAndUpdate(
+        { _id: id },
+        { $push: { expenses: expense } },
+        { new: true, runValidators: true }
+      );
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      res.redirect(`/expensesum/${user._id}`);
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  };
 
 exports.updateExpense = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send();
-    const expense = user.expenses.id(req.params.expenseId);
-    if (!expense) return res.status(404).send();
-    expense.set(req.body);
-    await user.save();
-    res.send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-};
+    try {
+      const { id, expenseId } = req.params;
+      const { name, amount, date } = req.body;
+
+      console.log(name, amount, date);
+  
+      const user = await User.findOneAndUpdate(
+        { _id: id, "expenses._id": expenseId },
+        {
+          $set: {
+            "expenses.$.name": name,
+            "expenses.$.amount": amount,
+            "expenses.$.date": date,
+          }
+        },
+        { new: true } 
+      );
+  
+      if (!user) {
+        return res.status(404).json({ message: "User or expense not found" });
+      }
+  
+      res.json({ message: "Expense updated successfully", user });
+    } catch (error) {
+      res.status(400).send(error);
+    }
+  };
 
 exports.deleteExpense = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send();
-    const expense = user.expenses.id(req.params.expenseId);
-    if (!expense) return res.status(404).send();
-    expense.remove();
-    await user.save();
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-};
+    try {
+      const { id, expenseId } = req.params;
+  
+    
+      const user = await User.findByIdAndUpdate(
+        id,
+        {
+          $pull: { expenses: { _id: expenseId } }
+        },
+        { new: true } 
+      );
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.json({ message: "Expense deleted successfully", user });
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  };
+
 
 exports.addIncome = async (req, res) => {
   try {
@@ -172,32 +212,58 @@ exports.addIncome = async (req, res) => {
 };
 
 exports.updateIncome = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send();
-    const income = user.income.id(req.params.incomeId);
-    if (!income) return res.status(404).send();
-    income.set(req.body);
-    await user.save();
-    res.send(user);
-  } catch (error) {
-    res.status(400).send(error);
-  }
+   try {
+      const { id, incomeId} = req.params;
+      const { name, amount, date } = req.body;
+
+      console.log(name, amount, date);
+  
+      const user = await User.findOneAndUpdate(
+        { _id: id, "income._id": incomeId },
+        {
+          $set: {
+            "income.$.name": name,
+            "income.$.amount": amount,
+            "income.$.date": date,
+          }
+        },
+        { new: true } 
+      );
+  
+      if (!user) {
+        return res.status(404).json({ message: "User or expense not found" });
+      }
+  
+      res.json({ message: "Income updated successfully", user });
+    } catch (error) {
+      res.status(400).send(error);
+    }
 };
 
 exports.deleteIncome = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).send();
-    const income = user.income.id(req.params.incomeId);
-    if (!income) return res.status(404).send();
-    income.remove();
-    await user.save();
-    res.send(user);
-  } catch (error) {
-    res.status(500).send(error);
-  }
+    try {
+        const { id, incomeId} = req.params;
+    
+      
+        const user = await User.findByIdAndUpdate(
+          id,
+          {
+            $pull: { income: { _id: incomeId } }
+          },
+          { new: true } 
+        );
+    
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+    
+        res.json({ message: "Income deleted successfully", user });
+      } catch (error) {
+        res.status(500).send(error);
+      }
 };
+
+
 
 exports.getExpensesSum = async (req, res) => {
     try {

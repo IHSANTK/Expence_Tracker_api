@@ -11,9 +11,12 @@ const authenticate = (req, res, next) => {
   }
 
   try {
-    // Verify the access token
+ 
     const decoded = jwt.verify(accessToken, secretKey);
-    req.user = decoded.user;
+    console.log(decoded);
+
+    req.user = decoded.userId;
+    console.log(req.user);
     return next();
   } catch (error) {
     // Access token verification failed
@@ -28,6 +31,7 @@ const authenticate = (req, res, next) => {
     // Refresh token is provided but the access token is invalid
     try {
       const decodedRefresh = jwt.verify(refreshToken, secretKey);
+      
       const newAccessToken = jwt.sign(
         { user: decodedRefresh.user },
         secretKey,
