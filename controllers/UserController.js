@@ -291,7 +291,7 @@ exports.deleteIncome = async (req, res) => {
 
 exports.getallsummery = async (req, res) => {
     try {
-      console.log(req.params.id);
+    
   
       if (!req.user) {
         return res.status(401).send("Unauthorized");
@@ -325,6 +325,47 @@ exports.getallsummery = async (req, res) => {
     }
   };
 
+  exports.sorting = async (req, res) => {
+    try {
+      const userId = req.params.id;
+      const { sortingtype } = req.body;
+  
+      if (!req.user) {
+        return res.status(401).send("Unauthorized");
+      }
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+  
+      let sortedExpenses = [...user.expenses];
+      let sortedIncome = [...user.income];
+  
+      if (sortingtype === "Date ascending") {
+        sortedExpenses.sort((a, b) => new Date(a.date) - new Date(b.date));
+        sortedIncome.sort((a, b) => new Date(a.date) - new Date(b.date));
+      } else if (sortingtype === "Date descending") {
+        sortedExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+        sortedIncome.sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else if (sortingtype === "Amount ascending") {
+        sortedExpenses.sort((a, b) => a.amount - b.amount);
+        sortedIncome.sort((a, b) => a.amount - b.amount);
+      } else if (sortingtype === "Amount descending") {
+        sortedExpenses.sort((a, b) => b.amount - a.amount);
+        sortedIncome.sort((a, b) => b.amount - a.amount);
+      } else {
+        return res.status(400).send("Invalid sorting type");
+      }
+  
+      res.json({
+        sortedExpenses,
+        sortedIncome
+      });
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  };
 
 
 

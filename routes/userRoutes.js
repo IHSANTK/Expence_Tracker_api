@@ -22,6 +22,8 @@ router.delete('/deleteincome/:id/:incomeId',authenticate,UserController.deleteIn
 
 router.get('/allsummery/:id',authenticate,UserController.getallsummery) 
 
+router.post('/sorting/:id',authenticate,UserController.sorting)
+
 
 
 

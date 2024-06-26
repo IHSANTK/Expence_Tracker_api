@@ -267,6 +267,7 @@
  *         description: Server error
  */
 
+
 /**
  * @swagger
  * /deleteincome/{userId}/{expenseId}:
@@ -286,6 +287,7 @@
  *       500:
  *         description: Server error
  */
+
 
 /**
  * @swagger
@@ -324,6 +326,39 @@
  *         description: Server error
  */
 
+
+/**
+ * @swagger
+ * /sorting/{userId}:
+ *   post:
+ *     summary: Add income
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - sortingtype
+ *              
+ *             properties:
+ *              sortingtype:
+ *                 type: string  
+ *               
+ *     responses:
+ *       200:
+ *         description: Income added successfully
+ *       500:
+ *         description: Server error
+ */
 
 
 /**
