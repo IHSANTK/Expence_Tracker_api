@@ -18,7 +18,7 @@ const generateRefreshToken = (user) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log("oook");
+    console.log("ooook");
 
     const existingUser = await User.findOne({ email });
 
@@ -141,7 +141,7 @@ exports.addExpense = async (req, res) => {
       const user = await User.findOneAndUpdate(
         { _id: id },
         { $push: { expenses: expense } },
-        { new: true, runValidators: true }
+        { new: true }
       );
   
       if (!user) {
@@ -162,7 +162,7 @@ exports.updateExpense = async (req, res) => {
       const { id, expenseId } = req.params;
       const { name, amount, date } = req.body;
 
-      console.log(name, amount, date);
+     
   
       const user = await User.findOneAndUpdate(
         { _id: id, "expenses._id": expenseId },
@@ -242,7 +242,7 @@ exports.updateIncome = async (req, res) => {
       const { id, incomeId} = req.params;
       const { name, amount, date } = req.body;
 
-      console.log(name, amount, date);
+     
   
       const user = await User.findOneAndUpdate(
         { _id: id, "income._id": incomeId },

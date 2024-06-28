@@ -28,7 +28,7 @@ const authenticate = (req, res, next) => {
         );
     }
 
-    // Refresh token is provided but the access token is invalid
+    
     try {
       const decodedRefresh = jwt.verify(refreshToken, secretKey);
       
