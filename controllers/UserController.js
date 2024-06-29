@@ -18,7 +18,7 @@ const generateRefreshToken = (user) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    console.log("ooook");
+    console.log("oook");
 
     const existingUser = await User.findOne({ email });
 
